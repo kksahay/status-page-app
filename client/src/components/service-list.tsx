@@ -19,9 +19,9 @@ const mockServices: Service[] = [
 export function ServiceList() {
   const [services, setServices] = React.useState<Service[]>(mockServices)
 
-  const handleEdit = (id: string) => {
-    // Implement edit functionality
-  }
+  // const handleEdit = (id: string) => {
+  //   // Implement edit functionality
+  // }
 
   const handleDelete = (id: string) => {
     setServices(services.filter((service) => service.id !== id))
@@ -43,7 +43,7 @@ export function ServiceList() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => handleEdit(service.id)}>Edit</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => {}}>Edit</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleDelete(service.id)}>Delete</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
