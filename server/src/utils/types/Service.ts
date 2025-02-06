@@ -32,3 +32,8 @@ export class ServiceHistory {
         this.history = history;
     }
 }
+
+export class ServiceWorker {
+    userId!: number;
+    service!: Service[];
+}

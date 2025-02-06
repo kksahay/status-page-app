@@ -8,7 +8,7 @@ const app = new Hono();
 app.post("/create", authMiddleware.verifyJWT, (c) => serviceController.createService(c));
 app.put("/update", authMiddleware.verifyJWT, (c) => serviceController.updateService(c));
 app.delete("/delete/:serviceId", authMiddleware.verifyJWT, (c) => serviceController.deleteService(c));
-app.get("/services", authMiddleware.verifyJWT, (c) => serviceController.listOfServices(c));
-app.get("servicesHistory", authMiddleware.verifyJWT, (c) => serviceController.listOfUpdatesByService(c));
+app.get("/servicesList", authMiddleware.verifyJWT, (c) => serviceController.listOfServices(c));
+app.get("/servicesHistory", authMiddleware.verifyJWT, (c) => serviceController.listOfUpdatesByService(c));
 
 export default app;

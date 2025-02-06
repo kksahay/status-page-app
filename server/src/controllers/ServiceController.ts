@@ -3,10 +3,8 @@ import { BaseController } from "./BaseController.js";
 import { ServiceQueries } from "../utils/queries/ServiceQueries.js";
 import { Service, ServiceReport, ServiceHistory } from "../utils/types/Service.js";
 
-
 export class ServiceController extends BaseController {
-    private readonly serviceQueries: ServiceQueries;
-
+    private serviceQueries: ServiceQueries;
     constructor() {
         super();
         this.serviceQueries = new ServiceQueries();
@@ -56,10 +54,10 @@ export class ServiceController extends BaseController {
 
     async listOfUpdatesByService(c: Context) {
         try {
-            const user = c.get("user");
+            const userId = c.req.param("userId");
 
             // Get list of service IDs
-            const services = await this.serviceQueries.execGetListOfServiceId(user.userId);
+            const services = await this.serviceQueries.execGetListOfServiceId(parseInt(userId));
             const serviceIds = this.getValues(services);
 
             const serviceLogs: ServiceHistory[] = [];

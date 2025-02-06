@@ -33,6 +33,7 @@ export class UserController extends BaseController {
         try {
             const user: User = new User(await c.req.json());
             const existingUser = await this.userQueries.checkUser(user);
+
             if (existingUser.length < 1) {
                 return c.json({ message: "User does not exists" }, 400);
             }
@@ -51,7 +52,7 @@ export class UserController extends BaseController {
                 },
                 process.env.JWT_SECRET as string
             );
-            return c.json({ message: "User Authenticated successfully", token }, 200);
+            return c.json({ message: "User Authenticated successfully", role: accountInfoValue[2], token }, 200);
         } catch (error: any) {
             return c.json(error, 400);
         }
