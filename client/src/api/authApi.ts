@@ -1,11 +1,11 @@
 import api from "./http";
 
-export const loginApi = async (email: string, password: string) => {
-    const response = await api.post("/user/login", { email, password });
-    const { token } = response.data;
+export const loginApi = async (email: string, pwd: string) => {
+    const response = await api.post("/user/login", { email, pwd });
+    const { token, role } = response.data;
 
     localStorage.setItem("token", token);
-
+    localStorage.setItem("role", role);
     return response.data;
 };
 

@@ -1,7 +1,6 @@
 import { Nav } from "@/components/nav"
 import { StatusHeader } from "@/components/status-header"
 import { StatusMetrics } from "@/components/status-metrics"
-import { Notices } from "@/components/notices"
 
 export default function StatusPage() {
   return (
@@ -10,7 +9,6 @@ export default function StatusPage() {
       <main className="container mx-auto px-4 py-8 space-y-8 max-w-4xl">
         <StatusHeader />
         <StatusMetrics />
-        <Notices />
       </main>
     </div>
   )

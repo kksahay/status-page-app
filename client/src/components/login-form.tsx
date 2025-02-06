@@ -44,7 +44,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     if (emailError) return
 
     try {
-      const { data } = await loginApi(email, password);
+      const data = await loginApi(email, password);
+      console.log(data);
       login(data.role);
       navigate(data.role === "admin" ? "/admin" : "/dashboard");
     } catch (error) {

@@ -1,10 +1,8 @@
-"use client"
+import { Link } from "react-router-dom";
+import type * as React from "react";
+import { Activity, Bell, Cog, Command } from "lucide-react";
 
-import type * as React from "react"
-import { Activity, Bell, Cog, Command } from "lucide-react"
-
-import { NavMain } from "./nav-main"
-import { NavUser } from "./nav-user"
+import { NavUser } from "./nav-user";
 import {
     Sidebar,
     SidebarContent,
@@ -13,7 +11,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 const data = {
     user: {
@@ -24,21 +22,21 @@ const data = {
     navMain: [
         {
             title: "Services",
-            url: "/services",
+            url: "/dashboard/services",
             icon: Cog,
         },
         {
             title: "Incidents",
-            url: "/incidents",
+            url: "/dashboard/incidents",
             icon: Bell,
         },
         {
             title: "Maintenance",
-            url: "/maintenance",
+            url: "/dashboard/maintenance",
             icon: Activity,
         },
     ],
-}
+};
 
 export function UserSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return (
@@ -47,25 +45,35 @@ export function UserSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <a href="#">
+                            <Link to="/">
                                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                                     <Command className="size-4" />
                                 </div>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-semibold">Status App</span>
                                 </div>
-                            </a>
+                            </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
-                <NavMain items={data.navMain} />
+                <SidebarMenu>
+                    {data.navMain.map((item) => (
+                        <SidebarMenuItem key={item.url}>
+                            <SidebarMenuButton asChild>
+                                <Link to={item.url} className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-sidebar-accent">
+                                    <item.icon className="size-5" />
+                                    <span>{item.title}</span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    ))}
+                </SidebarMenu>
             </SidebarContent>
             <SidebarFooter>
                 <NavUser user={data.user} />
             </SidebarFooter>
         </Sidebar>
-    )
+    );
 }
-

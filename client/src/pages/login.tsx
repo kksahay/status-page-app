@@ -1,5 +1,5 @@
 import { GalleryVerticalEnd } from "lucide-react"
-import { Toaster } from "@/components/ui/toaster"
+
 import { LoginForm } from "@/components/login-form"
 
 export default function LoginPage() {
@@ -33,7 +33,7 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-      <Toaster />
+      
     </div>
   )
 }

@@ -1,9 +1,12 @@
-import { Link, useLocation } from "react-router-dom"
-import { Button } from "@/components/ui/button"
+import { Link, useLocation, useParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 export function Nav() {
-  const location = useLocation()
+  const location = useLocation();
+  const { userId } = useParams();
 
+  const isStatusActive = location.pathname.includes("/status");
+  const isEventsActive = location.pathname.includes("/events");
   return (
     <nav className="border-b">
       <div className="container mx-auto px-4 h-16 flex items-center">
@@ -12,22 +15,21 @@ export function Nav() {
           <div className="flex space-x-4">
             <Button
               variant="link"
-              className={location.pathname === "/" ? "text-primary font-medium" : "text-muted-foreground"}
+              className={isStatusActive ? "text-primary font-medium" : "text-muted-foreground"}
               asChild
             >
-              <Link to="/">Status</Link>
+              <Link to={`/status/${userId ?? "default"}`}>Status</Link>
             </Button>
             <Button
               variant="link"
-              className={location.pathname === "/events" ? "text-primary font-medium" : "text-muted-foreground"}
+              className={isEventsActive ? "text-primary font-medium" : "text-muted-foreground"}
               asChild
             >
-              <Link to="/events">Events</Link>
+              <Link to={`/status/${userId ?? "default"}/events`}>Events</Link>
             </Button>
           </div>
         </div>
       </div>
     </nav>
-  )
+  );
 }
-

@@ -1,64 +1,108 @@
-import { Info } from "lucide-react"
-import { formatUptime } from "../utils/format"
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip"
+import { Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { useParams } from "react-router-dom";
+import { io } from "socket.io-client";
+import { useEffect, useState } from "react";
+import { getStatusApi } from "@/api/statusApi";
 
 interface StatusMetricProps {
-  name: string
-  uptime: number
-  days: number[]
+  service_id: number;
+  title: string;
+  currentStatus: string;
+  // statuses are stored in chronological order (oldest first, newest last)
+  statuses: string[];
 }
 
-function StatusMetric({ name, uptime, days }: StatusMetricProps) {
+export const socket = io("http://localhost:3000");
+
+function StatusMetric({ title, statuses }: StatusMetricProps) {
+  // We want exactly 45 bars, with the newest status on the right.
+  // If there are fewer than 45 statuses, pad the left side with the first status (if available) so the bars don't appear gray.
+  const bars = statuses.length < 45 
+    ? [...Array(45 - statuses.length).fill(-1), ...statuses] 
+    : statuses.slice(-45);
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="font-medium">{name}</span>
+          <span className="font-medium">{title}</span>
           <Tooltip>
             <TooltipTrigger>
               <Info className="w-4 h-4 text-muted-foreground" />
             </TooltipTrigger>
             <TooltipContent>
-              <p>Service status over the last {days.length} days</p>
+              <p>Service status over the last {statuses.length} minutes</p>
             </TooltipContent>
           </Tooltip>
         </div>
-        <span className="text-sm text-muted-foreground">{formatUptime(uptime)}</span>
       </div>
       <div className="flex gap-0.5">
-        {days.map((status, i) => (
+        {bars.map((status, i) => (
           <div
             key={i}
             className={`h-8 flex-1 rounded-full ${
-              status === 1 ? "bg-green-500" : status === 0.5 ? "bg-yellow-500" : "bg-red-500"
+              status === 1 ? "bg-green-500" : status == 0 ? "bg-red-500" : "bg-gray-500"
             }`}
           />
         ))}
       </div>
       <div className="flex justify-between text-sm text-muted-foreground">
-        <span>45 days ago</span>
-        <span>Today</span>
+        <span>45 minutes ago</span>
+        <span>Now</span>
       </div>
     </div>
-  )
+  );
 }
 
 export function StatusMetrics() {
-  const metrics = [
-    { name: "OpenStatus", uptime: 99.99, days: Array(45).fill(1) },
-    { name: "OpenStatus Status Page", uptime: 99.97, days: Array(45).fill(1) },
-    { name: "OpenStatus API", uptime: 99.98, days: [...Array(43).fill(1), 0.5, Array(1).fill(1)] },
-    { name: "OpenStatus Astro Status Page", uptime: 99.98, days: Array(45).fill(1) },
-  ]
+  const [status, setStatus] = useState<StatusMetricProps[]>([]);
+  const { userId } = useParams();
+
+  async function fetchServiceReport() {
+      if (!userId) return;
+      try {
+        const response = await getStatusApi(parseInt(userId));
+        setStatus(response);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  useEffect(() => {
+    if (!userId) return;
+
+    fetchServiceReport()
+
+    // Append the new status to the end of the array (keeping chronological order)
+    const handleStatusUpdate = (data: { service_id: number; status: string }) => {
+      setStatus((prev) =>
+        prev.map((s) =>
+          s.service_id === data.service_id
+            ? { 
+                ...s, 
+                statuses: [...s.statuses, data.status].slice(-45) 
+              }
+            : s
+        )
+      );
+    };
+
+    socket.on(`service-update:${userId}`, handleStatusUpdate);
+    socket.on(`service-create`, fetchServiceReport);
+    
+    return () => {
+      socket.off(`service-update:${userId}`, handleStatusUpdate);
+      socket.off(`service-create`, fetchServiceReport);
+    };
+  }, [userId]);
 
   return (
     <TooltipProvider>
       <div className="space-y-8">
-        {metrics.map((metric) => (
-          <StatusMetric key={metric.name} {...metric} />
+        {status.map((s) => (
+          <StatusMetric key={s.service_id} {...s} />
         ))}
       </div>
     </TooltipProvider>
-  )
+  );
 }
-
