@@ -20,15 +20,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [role, setRole] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   const token = localStorage.getItem("token");
-  //   const storedRole = localStorage.getItem("role");
-  //   if (token) {
-  //     setIsAuthenticated(true);
-  //     setRole(storedRole);
-  //     // navigate(storedRole === "admin" ? "/admin" : "/dashboard");
-  //   }
-  // }, [navigate]);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const storedRole = localStorage.getItem("role");
+    if (token) {
+      setIsAuthenticated(true);
+      setRole(storedRole);
+      navigate(storedRole === "admin" ? "/admin" : "/dashboard");
+    }
+  }, []);
 
   const login = (userRole: string) => {
     setIsAuthenticated(true);

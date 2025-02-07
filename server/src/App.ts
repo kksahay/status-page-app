@@ -4,10 +4,12 @@ import { compress } from "hono/compress";
 import { cors } from "hono/cors";
 import { prettyJSON } from "hono/pretty-json";
 import { routers } from "./routes/index.js";
+import type { Server as HTTPServer } from "node:http";
+import { SocketConnection } from "./configs/SocketConnection.js";
 
 export class App {
     private readonly app;
-    public httpServer: ServerType;
+    private readonly httpServer: ServerType;
 
     constructor(private readonly PORT: number) {
         this.app = new Hono();
@@ -15,14 +17,17 @@ export class App {
             fetch: this.app.fetch,
             port: this.PORT,
         });
+        new SocketConnection(this.httpServer as HTTPServer);
+        this.middlewares();
+        this.routes();
+        console.log(`Server is running on Port: ${this.PORT}`);
+    }
+
+    private middlewares() {
         this.app.use(prettyJSON());
         this.app.use(cors());
         this.app.use(compress());
-        this.app.notFound((c) => {
-            return c.text("StatusPage Backend", 404);
-        });
-        this.routes();
-        console.log(`Server is running on Port: ${this.PORT}`);
+        this.app.notFound((c) => c.text("StatusPage Backend", 404));
     }
 
     private routes() {

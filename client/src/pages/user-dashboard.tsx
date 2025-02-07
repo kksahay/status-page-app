@@ -14,7 +14,7 @@ export default function UserDashboard() {
           </div>
         </header>
         <div className="flex-1 overflow-auto">
-          <Outlet /> {/* This renders the nested routes like ServicesPage or MaintenancePage */}
+          <Outlet />
         </div>
       </SidebarInset>
     </SidebarProvider>

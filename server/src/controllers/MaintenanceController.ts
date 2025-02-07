@@ -13,10 +13,22 @@ export class MaintenanceController extends BaseController {
 
     async createMaintenance(c: Context) {
         try {
+            const user = c.get("user");
             const maintenance = new Maintenance(await c.req.json());
+            maintenance.created_by = user.userId;
             await this.maintenanceQueries.execCreateMaintenance(maintenance);
             await this.maintenanceQueries.execCreateServiceReport(maintenance.service_id);
             return c.json({ message: "Maintenance created successfully" }, 200);
+        } catch (error: any) {
+            return c.json(error, 400);
+        }
+    }
+
+    async getMaintenance(c: Context) {
+        try {
+            const user = c.get("user");
+            const maintenanceList = await this.maintenanceQueries.execGetMaintenance(user.userId) as Maintenance[];
+            return c.json(maintenanceList, 200);
         } catch (error: any) {
             return c.json(error, 400);
         }
@@ -26,6 +38,7 @@ export class MaintenanceController extends BaseController {
         try {
             const maintenance = new Maintenance(await c.req.json());
             await this.maintenanceQueries.execUpdateMaintenance(maintenance);
+            await this.maintenanceQueries.execUpdateService(maintenance.service_id, maintenance.status);
             return c.json({ message: "Maintenance updated successfully" }, 200);
         } catch (error: any) {
             return c.json(error, 400);

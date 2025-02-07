@@ -44,7 +44,7 @@ export class ServiceQueries {
     async execGetListOfServiceId(userId: number): Promise<unknown[]> {
         const response = await sql`
             SELECT
-                service_id
+                title, service_id
             FROM
                 public.tblService
             WHERE

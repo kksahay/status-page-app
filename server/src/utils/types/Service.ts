@@ -25,15 +25,23 @@ export class ServiceReport {
 
 export class ServiceHistory {
     service_id!: number;
+    title!: string;
     history!: ServiceReport[];
 
-    constructor(service_id: number, history: ServiceReport[]) {
+    constructor(service_id: number, title: string, history: ServiceReport[]) {
         this.service_id = service_id;
         this.history = history;
+        this.title = title;
     }
 }
 
-export class ServiceWorker {
-    userId!: number;
-    service!: Service[];
+export class Status {
+    service_id!: number;
+    title!: string;
+    currentStatus!: string;
+    statuses!: number[];
+
+    constructor(data?: Partial<Status>) {
+        Object.assign(this, data);
+    }
 }

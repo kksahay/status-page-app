@@ -1,5 +1,5 @@
 import * as React from "react";
-import { MoreVertical, Settings, AlertTriangle, Server } from "lucide-react";
+import { MoreVertical, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,11 +23,13 @@ type ServiceListProps = {
   setServices: React.Dispatch<React.SetStateAction<Service[]>>
 }
 
-export function ServiceList({ services, setServices }: ServiceListProps) {
+export function IncidentList({ services, setServices }: ServiceListProps) {
   const [selectedService, setSelectedService] = React.useState<Service | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const { toast } = useToast();
+
+  
 
   const handleDelete = async () => {
     if (!selectedService) return;
@@ -93,7 +95,7 @@ export function ServiceList({ services, setServices }: ServiceListProps) {
           <CardContent className="flex items-center justify-between p-4">
             <div>
               <h3 className="text-lg font-semibold text-gray-800">{service.title}</h3>
-              <p className="text-sm text-gray-500">{service.endpoint}</p>
+              <p className="text-sm text-gray-500">{service.status}</p>
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -142,24 +144,13 @@ export function ServiceList({ services, setServices }: ServiceListProps) {
               <Label htmlFor="endpoint">Endpoint</Label>
               <Input id="endpoint" value={selectedService?.endpoint || ""} disabled />
             </div>
+            
             <div className="flex flex-wrap gap-2">
               <Button
-                variant={selectedService?.selectedType === "Degraded Performance" ? "default" : "outline"}
-                onClick={() => selectType("Degraded Performance")}
+                variant={selectedService?.selectedType === "Operational" ? "default" : "outline"}
+                onClick={() => selectType("Operational")}
               >
-                <Settings className="w-4 h-4 mr-2" /> Degraded Performance
-              </Button>
-              <Button
-                variant={selectedService?.selectedType === "Partial Outage" ? "default" : "outline"}
-                onClick={() => selectType("Partial Outage")}
-              >
-                <AlertTriangle className="w-4 h-4 mr-2" /> Partial Outage
-              </Button>
-              <Button
-                variant={selectedService?.selectedType === "Major Outage" ? "default" : "outline"}
-                onClick={() => selectType("Major Outage")}
-              >
-                <Server className="w-4 h-4 mr-2" /> Major Outage
+                <Settings className="w-4 h-4 mr-2" /> Operational
               </Button>
             </div>
             <div>

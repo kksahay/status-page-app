@@ -25,7 +25,7 @@ export class JobQueue {
         this.io = SocketConnection.getIO();
         await this.queue.add("endpoints-monitor", {}, {
             repeat: {
-                every: 60 * 1000,
+                every: 5 * 1000,
             },
             removeOnComplete: true,
         })
@@ -50,8 +50,9 @@ export class JobQueue {
                 const lastTwo = await this.redis.lrange(key, 0, 1);
                 if (lastTwo.length === 2 && lastTwo[0] === "0" && lastTwo[1] === "0") {
                     await this.jobQueries.execDowngradeService(service_id);
+                    await this.jobQueries.execInsertIntoReport(service_id);
                 }
-                await this.redis.lpush(key, 1);
+                await this.redis.lpush(key, 0);
                 await this.redis.ltrim(key, 0, 44);
                 this.io.emit(`service-update:${created_by}`, { service_id, status: 0 });
             }

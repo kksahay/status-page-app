@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes, Navigate, BrowserRouter } from "react-router-dom";
 import { useContext } from "react";
 import EventsPage from "./pages/events-page";
 import StatusPage from "./pages/status-page";
@@ -10,17 +10,18 @@ import { Analytics } from "@vercel/analytics/react";
 import ServicesPage from "./pages/services";
 import MaintenancePage from "./pages/maintenance";
 import { Toaster } from "@/components/ui/toaster"
+import IncidentsPage from "./pages/incidents";
 
 const ProtectedRoute = ({ element, requiredRole }: { element: JSX.Element; requiredRole?: string }) => {
   const { isAuthenticated, role } = useContext(AuthContext);
 
-  // if (!isAuthenticated) {
-  //   return <Navigate to="/" replace />; // Redirect to login if not authenticated
-  // }
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
 
-  // if (requiredRole && role !== requiredRole) {
-  //   return <Navigate to={role === "admin" ? "/admin" : "/dashboard"} replace />;
-  // }
+  if (requiredRole && role !== requiredRole) {
+    return <Navigate to={role === "admin" ? "/admin" : "/dashboard"} replace />;
+  }
 
   return element;
 };
@@ -33,17 +34,18 @@ function App() {
 
           <Route path="/" element={<LoginPage />} />
           <Route path="/status/:userId" element={<StatusPage />} />
-          <Route path="/status/:userId/events" element={<Event sPage />} />
+          <Route path="/status/:userId/events" element={<EventsPage />} />
 
 
-          {/* <Route path="/admin" element={<ProtectedRoute element={<AdminDashboard />} requiredRole="admin" />} /> */}
+          <Route path="/admin" element={<ProtectedRoute element={<AdminDashboard />} requiredRole="admin" />} />
 
 
-          {/* <Route path="/dashboard" element={<ProtectedRoute element={<UserDashboard />} requiredRole="user" />}>
+          <Route path="/dashboard" element={<ProtectedRoute element={<UserDashboard />} requiredRole="user" />}>
             <Route index element={<ServicesPage />} />
             <Route path="services" element={<ServicesPage />} />
+            <Route path="incidents" element={<IncidentsPage />} />
             <Route path="maintenance" element={<MaintenancePage />} />
-          </Route> */}
+          </Route>
         </Routes>
         <Toaster />
       </div>
