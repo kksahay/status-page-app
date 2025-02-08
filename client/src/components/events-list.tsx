@@ -1,14 +1,13 @@
-import { Activity, CheckCircle } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CheckCircle, AlertTriangle, ShieldAlert, XCircle, CalendarCheck, Wrench } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getServiceReport } from "@/api/serviceApi";
 import { formatDate } from "@/utils/format";
-import { socket } from "./status-metrics";
-
+import { socket } from "./status-metrics"; // Ensure this is the correct import for your socket instance
 
 interface ServiceReport {
-  service_id: string;
+  service_id: number;
   title: string;
   history: {
     title: string;
@@ -18,26 +17,35 @@ interface ServiceReport {
   }[];
 }
 
+function getStatusIcon(status: string) {
+  switch (status.toLowerCase()) {
+    case "operational":
+      return <CheckCircle className="w-5 h-5 text-green-600" />;
+    case "maintenance scheduled":
+      return <CalendarCheck className="w-5 h-5 text-blue-500" />;
+    case "maintenance ongoing":
+      return <Wrench className="w-5 h-5 text-blue-600" />;
+    case "maintenance completed":
+      return <CheckCircle className="w-5 h-5 text-blue-600" />;
+    case "degraded performance":
+      return <AlertTriangle className="w-5 h-5 text-orange-500" />;
+    case "partial outage":
+      return <ShieldAlert className="w-5 h-5 text-yellow-500" />;
+    case "major outage":
+      return <XCircle className="w-5 h-5 text-red-600" />;
+    default:
+      return <AlertTriangle className="w-5 h-5 text-gray-400" />;
+  }
+}
+
 function EventCard({ event }: { event: ServiceReport["history"][0] }) {
   return (
-    <Card className="rounded-lg">
-      <CardHeader className="flex flex-row items-center justify-between pb-4">
-        <CardTitle className="text-xl font-semibold text-gray-900">{event.title}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-5 text-gray-800">
-        <div className="flex gap-5">
-          {event.change_status === "resolved" ? (
-            <CheckCircle className="w-6 h-6 text-green-600 mt-1 flex-shrink-0" />
-          ) : (
-            <Activity className="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" />
-          )}
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <span className="font-semibold capitalize text-gray-900">{event.description}</span>
-              <span className="text-sm text-gray-500">{formatDate(event.created_at)}</span>
-            </div>
-            <p className="text-base text-gray-700 whitespace-pre-line">{event.description}</p>
-          </div>
+    <Card className="rounded-xl border border-gray-200 shadow-sm">
+      <CardContent className="p-4 flex gap-4 items-start">
+        <div className="flex-shrink-0">{getStatusIcon(event.change_status)}</div>
+        <div className="flex flex-col space-y-1">
+          <p className="text-sm text-gray-600">{event.description}</p>
+          <span className="text-xs text-gray-400">{formatDate(event.created_at)}</span>
         </div>
       </CardContent>
     </Card>
@@ -46,15 +54,19 @@ function EventCard({ event }: { event: ServiceReport["history"][0] }) {
 
 export function EventsList() {
   const [serviceReport, setServiceReport] = useState<ServiceReport[]>([]);
+  const [loading, setLoading] = useState(true);
   const { userId } = useParams();
 
   async function fetchServiceReport() {
     if (!userId) return;
+    setLoading(true);
     try {
       const response = await getServiceReport(parseInt(userId));
       setServiceReport(response);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -62,40 +74,70 @@ export function EventsList() {
     if (!userId) return;
     fetchServiceReport();
 
-    socket.on("service-update", fetchServiceReport);
-    socket.on("service-delete", fetchServiceReport);
+    const handleServiceUpdate = (updatedReport: { service_id: number, title: string, description: string, change_status: string }) => {
+      setServiceReport((prevReports) =>
+        prevReports.map((report) =>
+          report.service_id === updatedReport.service_id
+            ? {
+              ...report, history: [
+                {
+                  title: updatedReport.title,
+                  description: updatedReport.description,
+                  change_status: updatedReport.change_status,
+                  created_at: new Date().toISOString(),
+                },
+                ...report.history,
+              ]
+            }
+            : report
+        )
+      );
+    };
+
+    const handleServiceDelete = (serviceId: string) => {
+      setServiceReport((prevReports) =>
+        prevReports.filter((report) => report.service_id !== parseInt(serviceId))
+      );
+    };
+
+    socket.on(`service-update:${userId}`, handleServiceUpdate);
+    socket.on(`service-delete:${userId}`, handleServiceDelete);
+    socket.on(`maintenance-update:${userId}`, handleServiceUpdate);
 
     return () => {
-      socket.off("service-update", fetchServiceReport);
-      socket.off("service-delete", fetchServiceReport);
+      socket.off(`service-update:${userId}`, handleServiceUpdate);
+      socket.off(`service-delete:${userId}`, handleServiceDelete);
+      socket.off(`maintenance-update:${userId}`, handleServiceUpdate);
     };
   }, [userId]);
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex-1 space-y-2 text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">OpenStatus Status Page</h1>
-          <p className="text-lg text-gray-600">Our own status page 🚀</p>
-        </div>
+    <div className="max-w-3xl mx-auto space-y-6">
+      <div className="text-center space-y-2">
+        <h1 className="text-3xl font-bold text-gray-900">Status Page</h1>
+        <p className="text-sm text-gray-500">Keep track of real-time service updates 🚀</p>
       </div>
-      <div className="space-y-14">
-        {serviceReport.map(
-          (item) =>
-            item.history.length > 0 && (
-              <div key={item.service_id} className="space-y-6">
-                <h2 className="text-2xl font-semibold sticky top-0 bg-white py-3 z-10 border-b-2 border-gray-300">
-                  {item.title}
-                </h2>
-                <div className="space-y-5">
-                  {item.history.map((event) => (
-                    <EventCard key={event.created_at} event={event} />
-                  ))}
+      {loading ? (
+        <div className="text-center text-gray-500 py-6 text-sm">Fetching latest updates...</div>
+      ) : serviceReport.length === 0 ? (
+        <div className="text-center text-gray-500 py-6 text-sm">No incidents to report.</div>
+      ) : (
+        <div className="space-y-8">
+          {serviceReport.map(
+            (item) =>
+              item.history.length > 0 && (
+                <div key={item.service_id} className="space-y-4">
+                  <h2 className="text-lg font-semibold text-gray-900 border-b pb-1">{item.title}</h2>
+                  <div className="space-y-3">
+                    {item.history.map((event) => (
+                      <EventCard key={event.created_at} event={event} />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )
-        )}
-      </div>
+              )
+          )}
+        </div>
+      )}
     </div>
   );
 }

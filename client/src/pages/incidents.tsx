@@ -7,14 +7,25 @@ import { CloudAlert } from "lucide-react"
 export default function IncidentsPage() {
     const [services, setServices] = React.useState<Service[]>([])
 
-    React.useEffect(() => {
-        const fetchServices = async () => {
+    const fetchServices = async () => {
+        try {
             const response = await getServicesApi()
-            const operationalServices = response.filter((service: Service) => service.status !== "Operational")
+            const operationalServices = response.filter((service: Service) => (service.status !== "Operational" && service.status !== "Maintenance"));
             setServices(operationalServices)
+
+        } catch (error) {
+            console.log(error);
         }
+    }
+
+
+    React.useEffect(() => {
         fetchServices()
     }, []);
+
+    const handleServiceUpdated = async () => {
+        await fetchServices()
+    }
 
     return (
         <div className="p-6">
@@ -24,7 +35,7 @@ export default function IncidentsPage() {
                     <h1 className="text-3xl font-extrabold text-black tracking-wide">Incidents</h1>
                 </div>
             </div>
-            <IncidentList services={services} setServices={setServices} />
+            <IncidentList services={services} setServices={setServices} onSuccess={handleServiceUpdated} />
         </div>
     )
 }

@@ -21,9 +21,10 @@ export type Service = {
 type ServiceListProps = {
   services: Service[]
   setServices: React.Dispatch<React.SetStateAction<Service[]>>
+  onSuccess?: () => void
 }
 
-export function ServiceList({ services, setServices }: ServiceListProps) {
+export function ServiceList({ services, setServices, onSuccess }: ServiceListProps) {
   const [selectedService, setSelectedService] = React.useState<Service | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
@@ -46,12 +47,13 @@ export function ServiceList({ services, setServices }: ServiceListProps) {
         variant: "destructive",
       });
     }
+    onSuccess?.();
     setIsDeleteDialogOpen(false);
   };
 
   const handleEdit = async () => {
     if (!selectedService) return;
-
+    
     try {
       const response = await updateServiceApi(
         selectedService.service_id,
@@ -76,6 +78,7 @@ export function ServiceList({ services, setServices }: ServiceListProps) {
         variant: "destructive",
       });
     }
+    onSuccess?.();
     setIsEditDialogOpen(false);
   };
 

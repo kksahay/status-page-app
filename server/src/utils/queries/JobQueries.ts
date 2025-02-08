@@ -29,7 +29,7 @@ export class JobQueries {
         INSERT INTO 
                 public.tblServiceReport (service_id, title, description, change_status)
             VALUES
-                (${serviceId}, ${'Outage'}, ${'Error in API response'}, ${'Major Ourage'})
+                (${serviceId}, ${'Outage'}, ${'Error in API response'}, ${'Major Outage'})
         `
     }
 
@@ -39,11 +39,12 @@ export class JobQueries {
                 maintenance_id, 
                 service_id, 
                 start_time, 
-                end_time
+                end_time,
+                created_by
             FROM
                 public.tblMaintenance
             WHERE
-                start_time >= CURRENT_TIMESTAMP
+                CURRENT_TIMESTAMP >= start_time
             AND
                 status = 'Scheduled'
         `
@@ -56,7 +57,8 @@ export class JobQueries {
                 maintenance_id, 
                 service_id, 
                 start_time, 
-                end_time
+                end_time,
+                created_by
             FROM
                 public.tblMaintenance
             WHERE

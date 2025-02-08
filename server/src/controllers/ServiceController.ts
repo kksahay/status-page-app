@@ -18,7 +18,7 @@ export class ServiceController extends BaseController {
             const service = new Service(await c.req.json());
             service.created_by = user.userId;
             await this.serviceQueries.execCreateService(service);
-            SocketConnection.getIO().emit(`service-create`);
+            SocketConnection.getIO().emit(`service-create:${user.userId}`);
             return c.json({ message: "Service created successfully" }, 200);
         } catch (error: any) {
             return c.json(error, 400);
@@ -27,9 +27,11 @@ export class ServiceController extends BaseController {
 
     async updateService(c: Context) {
         try {
+            const user = c.get("user");
             const serviceReport = new ServiceReport(await c.req.json());
             await this.serviceQueries.execUpdateService(serviceReport);
-            SocketConnection.getIO().emit(`service-update`);
+            await this.serviceQueries.execUpdateServiceStatus(serviceReport.service_id, serviceReport.change_status);
+            SocketConnection.getIO().emit(`service-update:${user.userId}`, serviceReport);
             return c.json({ message: "Service updated successfully" }, 200);
         } catch (error: any) {
             return c.json(error, 400);
@@ -38,9 +40,10 @@ export class ServiceController extends BaseController {
 
     async deleteService(c: Context) {
         try {
+            const user = c.get("user");
             const serviceId = c.req.param("serviceId");
             await this.serviceQueries.execDeleteService(parseInt(serviceId));
-            SocketConnection.getIO().emit(`service-delete`);
+            SocketConnection.getIO().emit(`service-delete:${user.userId}`, serviceId);
             return c.json({ message: "Service deleted successfully" }, 200);
         } catch (error: any) {
             return c.json(error, 400);

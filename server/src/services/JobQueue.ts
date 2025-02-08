@@ -1,3 +1,4 @@
+
 import { Queue, Worker } from "bullmq";
 import type { Service } from "../utils/types/Service.js";
 import { redisClient } from "../configs/RedisClient.js";
@@ -51,7 +52,7 @@ export class JobQueue {
                 if (response.ok) {
                     await this.redis.lpush(key, 1);
                     await this.redis.ltrim(key, 0, 44);
-                    this.io.emit(`service-update:${created_by}`, { service_id, status: 1 });
+                    this.io.emit(`status-update:${created_by}`, { service_id, status: 1 });
                 } else {
                     throw Error();
                 }
@@ -60,10 +61,11 @@ export class JobQueue {
                 if (lastTwo.length === 2 && lastTwo[0] === "0" && lastTwo[1] === "0") {
                     await this.jobQueries.execDowngradeService(service_id);
                     await this.jobQueries.execInsertIntoReport(service_id);
+                    this.io.emit(`service-update:${created_by}`, { service_id, title: "Outage", description: "Error in API Response", change_status: "Major Outage" });
                 }
                 await this.redis.lpush(key, 0);
                 await this.redis.ltrim(key, 0, 44);
-                this.io.emit(`service-update:${created_by}`, { service_id, status: 0 });
+                this.io.emit(`status-update:${created_by}`, { service_id, status: 0 });
             }
         }
     }
@@ -72,18 +74,18 @@ export class JobQueue {
         const scheduledMaintenances = await this.jobQueries.execGetScheduledMaintenances() as Maintenance[];
         const completedMaintenances = await this.jobQueries.execGetCompletedMaintenances() as Maintenance[];
         for (const maintenance of scheduledMaintenances) {
-            const { maintenance_id, service_id } = maintenance;
+            const { maintenance_id, service_id, created_by } = maintenance;
             await this.jobQueries.execSetServiceUnderMaintenance(maintenance_id, "Ongoing");
             await this.jobQueries.execUpdateService(service_id, "Maintenance");
-            await this.jobQueries.execCreateServiceReport(service_id, "Maintenance Started", "Maintenance Started");
-            this.io.emit(`maintenance-update:${service_id}`);
+            await this.jobQueries.execCreateServiceReport(service_id, "Maintenance Ongoing", "Maintenance Ongoing");
+            this.io.emit(`maintenance-update:${created_by}`, { service_id, title: "Maintenance", description: "Maintenance Ongoing", change_status: "Maintenance Ongoing" });
         }
         for (const maintenance of completedMaintenances) {
-            const { maintenance_id, service_id } = maintenance;
+            const { maintenance_id, service_id, created_by } = maintenance;
             await this.jobQueries.execSetServiceUnderMaintenance(maintenance_id, "Completed");
             await this.jobQueries.execUpdateService(service_id, "Operational");
             await this.jobQueries.execCreateServiceReport(service_id, "Maintenance Completed", "Maintenance Completed");
-            this.io.emit(`maintenance-update:${service_id}`);
+            this.io.emit(`maintenance-update:${created_by}`, { service_id, title: "Maintenance", description: "Maintenance Completed", change_status: "Operational" });
         }
     }
 }

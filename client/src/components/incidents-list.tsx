@@ -21,9 +21,10 @@ export type Service = {
 type ServiceListProps = {
   services: Service[]
   setServices: React.Dispatch<React.SetStateAction<Service[]>>
+  onSuccess?: () => void
 }
 
-export function IncidentList({ services, setServices }: ServiceListProps) {
+export function IncidentList({ services, setServices, onSuccess }: ServiceListProps) {
   const [selectedService, setSelectedService] = React.useState<Service | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
@@ -48,6 +49,7 @@ export function IncidentList({ services, setServices }: ServiceListProps) {
         variant: "destructive",
       });
     }
+    onSuccess?.()
     setIsDeleteDialogOpen(false);
   };
 
@@ -78,6 +80,7 @@ export function IncidentList({ services, setServices }: ServiceListProps) {
         variant: "destructive",
       });
     }
+    onSuccess?.()
     setIsEditDialogOpen(false);
   };
 
@@ -94,7 +97,7 @@ export function IncidentList({ services, setServices }: ServiceListProps) {
         >
           <CardContent className="flex items-center justify-between p-4">
             <div>
-              <h3 className="text-md font-semibold text-white">Title: {service.title}</h3>
+              <h3 className="text-md font-semibold text-white">{service.title}</h3>
               <p className="text-xs text-white mt-1">Endpoint: {service.endpoint}</p>
             </div>
             <div className="flex items-center gap-4">

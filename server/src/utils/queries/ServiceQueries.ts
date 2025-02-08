@@ -21,6 +21,16 @@ export class ServiceQueries {
         `;
     }
 
+    async execUpdateServiceStatus(serviceId: number, status: string) {
+        await sql`
+            UPDATE
+                public.tblService
+            SET
+                status = ${status}
+            WHERE
+                service_id = ${serviceId}
+        `;
+    }
     async execDeleteService(serviceId: number) {
         await sql`
             DELETE FROM
@@ -56,11 +66,16 @@ export class ServiceQueries {
     async execGetServiceHistory(serviceId: number): Promise<unknown[]> {
         const response = await sql`
             SELECT
-                title, description, change_status, created_at
+                title, 
+                description, 
+                change_status, 
+                created_at
             FROM
                 public.tblServiceReport
             WHERE
                 service_id = ${serviceId}
+            ORDER BY
+                created_at DESC;
         `;
         return response;
     }

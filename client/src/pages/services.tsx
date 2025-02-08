@@ -67,7 +67,7 @@ export default function ServicesPage() {
       {loading ? (
         <div className="flex justify-center items-center py-10 text-gray-400 text-sm">Loading services...</div>
       ) : (
-        <ServiceList services={services} setServices={setServices} />
+        <ServiceList services={services} setServices={setServices} onSuccess={handleServiceAdded}/>
       )}
     </div>
   )

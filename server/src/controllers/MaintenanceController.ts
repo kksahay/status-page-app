@@ -2,6 +2,7 @@ import type { Context } from "hono";
 import { MaintenanceQueries } from "../utils/queries/MaintenanceQueries.js";
 import { BaseController } from "./BaseController.js";
 import { Maintenance } from "../utils/types/Maintenance.js";
+import { SocketConnection } from "../configs/SocketConnection.js";
 
 export class MaintenanceController extends BaseController {
     private readonly maintenanceQueries: MaintenanceQueries;
@@ -18,6 +19,7 @@ export class MaintenanceController extends BaseController {
             maintenance.created_by = user.userId;
             await this.maintenanceQueries.execCreateMaintenance(maintenance);
             await this.maintenanceQueries.execCreateServiceReport(maintenance.service_id);
+            SocketConnection.getIO().emit(`maintenance-update:${user.userId}`, { service_id: maintenance.service_id, title: "Maintenance", description: "Maintenance Scheduled", change_status: "Maintenance Scheduled" })
             return c.json({ message: "Maintenance created successfully" }, 200);
         } catch (error: any) {
             return c.json(error, 400);
