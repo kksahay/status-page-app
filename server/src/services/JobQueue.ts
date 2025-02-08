@@ -5,6 +5,7 @@ import type { Redis } from "ioredis";
 import { JobQueries } from "../utils/queries/JobQueries.js";
 import type { Server } from "socket.io";
 import { SocketConnection } from "../configs/SocketConnection.js";
+import type { Maintenance } from "../utils/types/Maintenance.js";
 
 export class JobQueue {
     public queue: Queue;
@@ -68,22 +69,21 @@ export class JobQueue {
     }
 
     private async checkMaintenance() {
-        // console.log("Checking for scheduled maintenance...");
-        // const scheduledMaintenances = await this.jobQueries.execGetScheduledMaintenances();
-
-        // for (const maintenance of scheduledMaintenances) {
-        //     const { id, service_id, start_time, end_time } = maintenance;
-        //     const now = new Date();
-
-        //     if (now >= new Date(start_time) && now <= new Date(end_time)) {
-        //         console.log(`Marking service ${service_id} as under maintenance.`);
-        //         // await this.jobQueries.execSetServiceUnderMaintenance(service_id);
-        //         this.io.emit(`maintenance-update:${service_id}`, { status: "under_maintenance" });
-        //     } else if (now > new Date(end_time)) {
-        //         console.log(`Marking service ${service_id} as active after maintenance.`);
-        //         // await this.jobQueries.execSetServiceActive(service_id);
-        //         this.io.emit(`maintenance-update:${service_id}`, { status: "active" });
-        //     }
-        // }
+        const scheduledMaintenances = await this.jobQueries.execGetScheduledMaintenances() as Maintenance[];
+        const completedMaintenances = await this.jobQueries.execGetCompletedMaintenances() as Maintenance[];
+        for (const maintenance of scheduledMaintenances) {
+            const { maintenance_id, service_id } = maintenance;
+            await this.jobQueries.execSetServiceUnderMaintenance(maintenance_id, "Ongoing");
+            await this.jobQueries.execUpdateService(service_id, "Maintenance");
+            await this.jobQueries.execCreateServiceReport(service_id, "Maintenance Started", "Maintenance Started");
+            this.io.emit(`maintenance-update:${service_id}`);
+        }
+        for (const maintenance of completedMaintenances) {
+            const { maintenance_id, service_id } = maintenance;
+            await this.jobQueries.execSetServiceUnderMaintenance(maintenance_id, "Completed");
+            await this.jobQueries.execUpdateService(service_id, "Operational");
+            await this.jobQueries.execCreateServiceReport(service_id, "Maintenance Completed", "Maintenance Completed");
+            this.io.emit(`maintenance-update:${service_id}`);
+        }
     }
 }

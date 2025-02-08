@@ -32,4 +32,70 @@ export class JobQueries {
                 (${serviceId}, ${'Outage'}, ${'Error in API response'}, ${'Major Ourage'})
         `
     }
+
+    async execGetScheduledMaintenances(): Promise<unknown[]> {
+        const response = sql`
+            SELECT 
+                maintenance_id, 
+                service_id, 
+                start_time, 
+                end_time
+            FROM
+                public.tblMaintenance
+            WHERE
+                start_time >= CURRENT_TIMESTAMP
+            AND
+                status = 'Scheduled'
+        `
+        return response;
+    }
+
+    async execGetCompletedMaintenances(): Promise<unknown[]> {
+        const response = sql`
+            SELECT 
+                maintenance_id, 
+                service_id, 
+                start_time, 
+                end_time
+            FROM
+                public.tblMaintenance
+            WHERE
+                end_time <= CURRENT_TIMESTAMP
+            AND
+                status = 'Ongoing'
+        `
+        return response;
+    }
+
+    async execSetServiceUnderMaintenance(maintenanceId: number, status: string) {
+        await sql`
+            UPDATE
+                public.tblMaintenance
+            SET
+                status = ${status}
+            WHERE
+                maintenance_id = ${maintenanceId}
+            
+        `
+    }
+
+    async execCreateServiceReport(serviceId: number, status: string, description: string) {
+        await sql`
+            INSERT INTO 
+                public.tblServiceReport (service_id, title, change_status, description)
+            VALUES
+                (${serviceId}, ${"Maintenance"}, ${status}, ${description})        `
+    }
+
+    async execUpdateService(serviceId: number, status: string) {
+        await sql`
+            UPDATE
+                public.tblService
+            SET
+                status = ${status}
+            WHERE
+                service_id = ${serviceId}
+        `
+    }
+
 }

@@ -3,7 +3,7 @@ FROM node:22.13.0-bullseye AS base
 RUN apt-get update && apt-get install -y --no-install-recommends dumb-init
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+RUN npm install -g pnpm
 WORKDIR /usr/src/app
 COPY package.json pnpm-lock.yaml .swcrc /usr/src/app/
 COPY src /usr/src/app/src

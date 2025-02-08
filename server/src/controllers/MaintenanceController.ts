@@ -37,8 +37,9 @@ export class MaintenanceController extends BaseController {
     async updateMaintenance(c: Context) {
         try {
             const maintenance = new Maintenance(await c.req.json());
-            await this.maintenanceQueries.execUpdateMaintenance(maintenance);
-            await this.maintenanceQueries.execUpdateService(maintenance.service_id, maintenance.status);
+            await this.maintenanceQueries.execUpdateMaintenance(maintenance.service_id);
+            await this.maintenanceQueries.execUpdateService(maintenance.service_id);
+            await this.maintenanceQueries.execUpdateServiceReport(maintenance.service_id);
             return c.json({ message: "Maintenance updated successfully" }, 200);
         } catch (error: any) {
             return c.json(error, 400);

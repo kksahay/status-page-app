@@ -7,20 +7,20 @@ export class MaintenanceQueries {
             INSERT INTO
                 public.tblMaintenance (service_id, start_time, end_time, status, created_by)
             VALUES
-                (${maintenance.service_id}, ${maintenance.start_time}, ${maintenance.end_time}, ${"Ongoing"}, ${maintenance.created_by})
+                (${maintenance.service_id}, ${maintenance.start_time}, ${maintenance.end_time}, ${"Scheduled"}, ${maintenance.created_by})
         `
     }
 
     async execCreateServiceReport(serviceId: number) {
         await sql`
             INSERT INTO 
-                public.tblServiceReport (service_id, title, change_status)
+                public.tblServiceReport (service_id, title, change_status, description)
             VALUES
-                (${serviceId}, ${"Maintenance"}, ${"Under Maintenance"})
+                (${serviceId}, ${"Maintenance"}, ${"Maintenance Scheduled"}, ${"Maintenance Scheduled"})
         `
     }
 
-    async execUpdateService(serviceId: number, status: string) {
+    async execUpdateService(serviceId: number) {
         await sql`
             UPDATE
                 public.tblService
@@ -31,35 +31,47 @@ export class MaintenanceQueries {
         `
     }
 
-    async execUpdateMaintenance(maintenance: Maintenance) {
+    async execUpdateMaintenance(serviceId: number) {
         await sql`
             UPDATE
                 public.tblMaintenance
             SET
                 status = ${"Completed"}
             WHERE
-                service_id = ${maintenance.service_id}
+                service_id = ${serviceId}
         `
     }
 
-    async execDeleteMaintenance(serviceId: number) {
+    async execUpdateServiceReport(serviceId: number) {
+        await sql`
+            INSERT INTO 
+                public.tblServiceReport (service_id, title, change_status, description)
+            VALUES
+                (${serviceId}, ${"Maintenance"}, ${"Maintenance Completed"}, ${"Maintenance Completed"})
+        `
+    }
+
+    async execDeleteMaintenance(maintenanceId: number) {
         await sql`
             DELETE FROM
                 public.tblMaintenance
             WHERE
-                service_id = ${serviceId}
+                maintenance_id = ${maintenanceId}
         `
     }
 
     async execGetMaintenance(userId: number): Promise<unknown[]> {
         const response = await sql`
             SELECT
-                maintenance_id, service_id, start_time, end_time, status
+                tM.maintenance_id, tM.service_id, tS.title, tM.start_time, tM.end_time, tM.status
             FROM
-                public.tblMaintenance
+                public.tblMaintenance tM
+                INNER JOIN
+                public.tblService tS
+                ON
+                tM.service_id = tS.service_id
             WHERE
-                created_by = ${userId}
-                
+                tM.created_by = ${userId}
         `
         return response;
     }
