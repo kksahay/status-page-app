@@ -3,9 +3,9 @@ import { Hono } from "hono";
 import { compress } from "hono/compress";
 import { cors } from "hono/cors";
 import { prettyJSON } from "hono/pretty-json";
-import { routers } from "./routes/index.js";
+import { routers } from "./routes/index";
 import type { Server as HTTPServer } from "node:http";
-import { SocketConnection } from "./configs/SocketConnection.js";
+import { SocketConnection } from "./configs/SocketConnection";
 
 export class App {
     private readonly app;

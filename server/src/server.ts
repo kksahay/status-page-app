@@ -1,7 +1,7 @@
 import type postgres from "postgres";
-import { App } from "./App.js";
-import { DatabaseConnection } from "./configs/DatabaseConnection.js";
-import { JobQueue } from "./services/JobQueue.js";
+import { App } from "./App";
+import { DatabaseConnection } from "./configs/DatabaseConnection";
+import { JobQueue } from "./services/JobQueue";
 
 const db = new DatabaseConnection();
 const jobQueue = new JobQueue();

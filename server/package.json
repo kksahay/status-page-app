@@ -1,6 +1,5 @@
 {
   "name": "taskbuddy-server",
-  "type": "module",
   "scripts": {
     "build": "swc src -d dist --config-file .swcrc",
     "start": "node --env-file=.env dist/server.js",
