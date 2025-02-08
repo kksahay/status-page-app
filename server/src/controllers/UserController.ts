@@ -1,8 +1,8 @@
+import bcrypt from 'bcryptjs';
 import { UserQueries } from './../utils/queries/UserQueries.js';
 import type { Context } from "hono";
 import { BaseController } from "./BaseController.js";
 import { User } from '../utils/types/index.js';
-import bcrypt from "bcrypt";
 import { sign } from 'hono/jwt';
 
 export class UserController extends BaseController {
