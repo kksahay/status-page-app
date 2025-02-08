@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-import { useState, useTransition } from "react"
+import { useState } from "react"
 import { Loader2, User, Mail, Lock } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { registerApi } from "@/api/authApi"
@@ -18,7 +18,7 @@ export function SignupForm({ onBackToLogin }: SignupFormProps) {
     const [email, setEmail] = useState("")
     const [pwd, setPwd] = useState("")
     const [emailError, setEmailError] = useState("")
-    const [isPending] = useTransition()
+    const [isPending, setIsPending] = useState(false)
     const { toast } = useToast()
 
     const validateEmail = (email: string) => {
@@ -39,22 +39,25 @@ export function SignupForm({ onBackToLogin }: SignupFormProps) {
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
+        setIsPending(true);
         if (emailError) return
         try {
             await registerApi(name, email, pwd);
             toast({
                 title: "Success",
-                description: "Your account has been created successfully."
+                description: "Your account has been created successfully.",
             })
+            setIsPending(false);
             onBackToLogin();
         } catch (error: any) {
+            setIsPending(false);
             toast({
                 title: "Error",
-                description: `${error.response.data.message}`,
+                description: `Something went wrong. Please try again!`,
                 variant: "destructive",
             });
         }
-        
+
     }
 
     const isFormValid = name.trim() !== "" && email.trim() !== "" && pwd.trim() !== "" && !emailError
@@ -121,7 +124,11 @@ export function SignupForm({ onBackToLogin }: SignupFormProps) {
                 </div>
                 <Button
                     type="submit"
-                    className="w-full transition-all duration-200 ease-in-out"
+                    className={cn(
+                        "w-full bg-black text-white transition-all duration-200 ease-in-out",
+                        "hover:bg-gray-800",
+                        "disabled:bg-gray-500 disabled:text-gray-300"
+                    )}
                     disabled={!isFormValid || isPending}
                 >
                     {isPending ? (
@@ -139,7 +146,7 @@ export function SignupForm({ onBackToLogin }: SignupFormProps) {
                 <button
                     type="button"
                     onClick={onBackToLogin}
-                    className="font-medium text-primary underline-offset-4 hover:underline"
+                    className="font-medium text-primary underline-offset-4 hover:underline text-blue-800"
                 >
                     Log in
                 </button>
@@ -147,4 +154,3 @@ export function SignupForm({ onBackToLogin }: SignupFormProps) {
         </form>
     )
 }
-

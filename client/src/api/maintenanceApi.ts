@@ -10,8 +10,8 @@ export const getMaintenanaceApi = async () => {
     return response.data;
 }
 
-export const updateMaintenanceApi = async (serviceId: number) => {
-    const response = await api.put("/maintenance/update", { serviceId });
+export const updateMaintenanceApi = async (service_id: number) => {
+    const response = await api.put("/maintenance/update", { service_id });
     return response.data;
 }
 

@@ -29,7 +29,7 @@ export function IncidentList({ services, setServices }: ServiceListProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const { toast } = useToast();
 
-  
+
 
   const handleDelete = async () => {
     if (!selectedService) return;
@@ -90,46 +90,60 @@ export function IncidentList({ services, setServices }: ServiceListProps) {
       {services.map((service) => (
         <Card
           key={service.service_id}
-          className="bg-gray-50 border border-gray-200 rounded-lg"
+          className="bg-gray-900 border-none text-white"
         >
           <CardContent className="flex items-center justify-between p-4">
             <div>
-              <h3 className="text-lg font-semibold text-gray-800">{service.title}</h3>
-              <p className="text-sm text-gray-500">{service.status}</p>
+              <h3 className="text-md font-semibold text-white">Title: {service.title}</h3>
+              <p className="text-xs text-white mt-1">Endpoint: {service.endpoint}</p>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-9 w-9 flex items-center justify-center">
-                  <MoreVertical className="h-5 w-5 text-gray-600" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-36 shadow-lg rounded-md">
-                <DropdownMenuItem
-                  className="px-4 py-2 hover:bg-gray-100 transition-all"
-                  onClick={() => {
-                    setSelectedService(service);
-                    setIsEditDialogOpen(true);
-                  }}
-                >
-                  Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="px-4 py-2 hover:bg-red-100 text-red-600 transition-all"
-                  onClick={() => {
-                    setSelectedService(service);
-                    setIsDeleteDialogOpen(true);
-                  }}
-                >
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center gap-4">
+              <span
+                className={`text-xs px-4 py-1 rounded-full font-semibold border-none ${service.status === "Maintenance"
+                  ? "bg-blue-100 text-blue-700"
+                  : service.status === "Degraded Performance" || service.status === "Partial Outage"
+                    ? "bg-orange-100 text-orange-700"
+                    : service.status === "Major Outage"
+                      ? "bg-red-100 text-red-700"
+                      : "bg-green-100 text-green-700"
+                  }`}
+              >
+                {service.status}
+              </span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-9 w-9 flex items-center justify-center">
+                    <MoreVertical className="h-5 w-5 text-white" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="min-w-24 bg-gray-900 text-white rounded-lg shadow-xl border border-gray-700 p-2 space-y-1 transition-all duration-200">
+                  <DropdownMenuItem
+                    className="px-4 py-2 rounded-md transition-all duration-200 hover:bg-gray-700 hover:text-gray-200 cursor-pointer"
+                    onClick={() => {
+                      setSelectedService(service);
+                      setIsEditDialogOpen(true);
+                    }}
+                  >
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="px-4 py-2 rounded-md transition-all duration-200 text-red-500 cursor-pointer"
+                    onClick={() => {
+                      setSelectedService(service);
+                      setIsDeleteDialogOpen(true);
+                    }}
+                  >
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </CardContent>
         </Card>
       ))}
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto w-full max-w-lg">
+        <DialogContent className="w-[50vw] max-w-2xl p-6 sm:p-8 md:p-10 rounded-lg shadow-lg bg-white">
           <DialogHeader>
             <DialogTitle>Edit Service</DialogTitle>
             <DialogDescription>Update the service details and save changes.</DialogDescription>
@@ -137,17 +151,31 @@ export function IncidentList({ services, setServices }: ServiceListProps) {
 
           <div className="space-y-4">
             <div>
-              <Label htmlFor="title">Title</Label>
-              <Input id="title" value={selectedService?.title || ""} disabled />
+              <Label htmlFor="title" className="text-sm font-medium text-gray-700">Title</Label>
+              <Input
+                id="title"
+                value={selectedService?.title || ""}
+                disabled
+                className="bg-gray-50 border border-gray-300 rounded-md text-gray-800 placeholder:text-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              />
             </div>
             <div>
               <Label htmlFor="endpoint">Endpoint</Label>
-              <Input id="endpoint" value={selectedService?.endpoint || ""} disabled />
+              <Input
+                id="endpoint"
+                value={selectedService?.endpoint || ""}
+                disabled
+                className="bg-gray-50 border border-gray-300 rounded-md text-gray-800 placeholder:text-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              />
             </div>
-            
+
             <div className="flex flex-wrap gap-2">
               <Button
                 variant={selectedService?.selectedType === "Operational" ? "default" : "outline"}
+                className={`${selectedService?.selectedType === "Operational"
+                  ? "bg-green-600 text-white hover:bg-green-800 hover:text-white"
+                  : "bg-transparent text-black"
+                  }`}
                 onClick={() => selectType("Operational")}
               >
                 <Settings className="w-4 h-4 mr-2" /> Operational
@@ -166,13 +194,19 @@ export function IncidentList({ services, setServices }: ServiceListProps) {
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={handleEdit} disabled={!selectedService?.description?.trim()}>Save Changes</Button>
+            <Button
+              onClick={handleEdit}
+              disabled={!selectedService?.description?.trim()}
+              className="bg-black hover:bg-black text-white font-semibold px-4 py-2 rounded-md transition-all flex items-center justify-center gap-2"
+            >
+              Save Changes
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
       {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
+        <DialogContent className="w-[50vw] max-w-2xl p-6 sm:p-8 md:p-10 rounded-lg shadow-lg bg-white">
           <DialogHeader>
             <DialogTitle>Delete Service</DialogTitle>
             <DialogDescription>
@@ -180,10 +214,13 @@ export function IncidentList({ services, setServices }: ServiceListProps) {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="destructive" onClick={handleDelete}>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              className="text-red-600 border border-red-600 hover:bg-red-600 hover:text-white font-semibold px-4 py-2 rounded-md transition-all flex items-center justify-center gap-2"
+            >
               Confirm Delete
             </Button>
-            <Button onClick={() => setIsDeleteDialogOpen(false)}>Cancel</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

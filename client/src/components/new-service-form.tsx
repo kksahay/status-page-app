@@ -41,43 +41,51 @@ export function NewServiceForm({ onSuccess }: NewServiceFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg border border-gray-200 space-y-6">
+      <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+        <PlusCircle className="size-5 text-gray-900" />
+        Add New Service
+      </h2>
       <div className="space-y-2">
-        <Label htmlFor="title" className="text-sm font-medium">
+        <Label htmlFor="title" className="text-sm font-medium text-gray-700">
           Title
         </Label>
         <div className="relative">
-          <PlusCircle className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+          <PlusCircle className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-500" />
           <Input
             id="title"
             placeholder="Enter service title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="pl-10 bg-gray-50 border border-gray-300 rounded-md text-gray-800 placeholder:text-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
             required
           />
         </div>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="endpoint" className="text-sm font-medium">
+        <Label htmlFor="endpoint" className="text-sm font-medium text-gray-700">
           Endpoint
         </Label>
         <div className="relative">
-          <Link className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+          <Link className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-500" />
           <Input
             id="endpoint"
             placeholder="Enter service endpoint"
             value={endpoint}
             onChange={(e) => setEndpoint(e.target.value)}
-            className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="pl-10 bg-gray-50 border border-gray-300 rounded-md text-gray-800 placeholder:text-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
             required
           />
         </div>
       </div>
-      <Button type="submit" className="w-full transition-all duration-300 hover:bg-blue-600" disabled={isLoading}>
+      <Button
+        type="submit"
+        className="w-full bg-gray-700 hover:bg-black text-white font-semibold px-4 py-2 rounded-md transition-all flex items-center justify-center gap-2"
+        disabled={isLoading}
+      >
         {isLoading ? (
           <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className="animate-spin size-4" />
             Adding Service...
           </>
         ) : (
@@ -87,4 +95,3 @@ export function NewServiceForm({ onSuccess }: NewServiceFormProps) {
     </form>
   )
 }
-

@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useContext, useState, useTransition } from "react"
+import { useContext, useState } from "react"
 import { SignupForm } from "./signup-form"
 import { Loader2, Mail, Lock } from "lucide-react"
 import type React from "react"
@@ -18,7 +18,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [emailError, setEmailError] = useState("")
-  const [isPending] = useTransition()
+  const [isPending, setIsPending] = useState(false);
   const { toast } = useToast()
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -42,13 +42,14 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (emailError) return
-
+    setIsPending(true);
     try {
       const data = await loginApi(email, password);
-      console.log(data);
       login(data.role);
       navigate(data.role === "admin" ? "/admin" : "/dashboard");
+      setIsPending(false);
     } catch (error) {
+      setIsPending(false);
       toast({
         title: "Error",
         description: "Login failed. Please check your credentials.",
@@ -108,7 +109,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
             </div>
             <Button
               type="submit"
-              className="w-full transition-all duration-200 ease-in-out"
+              className="w-full bg-black text-white transition-all duration-200 ease-in-out hover:bg-gray-800 disabled:bg-gray-700 disabled:text-gray-400"
               disabled={!isFormValid || isPending}
             >
               {isPending ? (
@@ -120,13 +121,14 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 "Log in"
               )}
             </Button>
+
           </div>
           <p className="text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
             <button
               type="button"
               onClick={() => setIsLogin(false)}
-              className="font-medium text-primary underline-offset-4 hover:underline"
+              className="font-medium text-primary underline-offset-4 hover:underline text-blue-700"
             >
               Sign up
             </button>
