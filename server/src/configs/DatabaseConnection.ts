@@ -3,7 +3,7 @@ import postgres from "postgres";
 export class DatabaseConnection {
     public sql: postgres.Sql;
     constructor() {
-        this.sql = postgres(process.env.DB_URI! || "postgres://myuser:mypassword@localhost:5432/mydatabase", {
+        this.sql = postgres(process.env.DB_URI! || "postgres://myuser:mypassword@postgres:5432/mydatabase", {
             port: 5432,
             ssl: process.env.DB_URI ? true : false
         });

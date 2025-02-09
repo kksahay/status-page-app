@@ -6,7 +6,7 @@ export class RedisClient {
     constructor() {
 
         this.redisClient = new Redis({
-            host: process.env.REDIS_HOST! || "127.0.0.1",
+            host: process.env.REDIS_HOST! || "redis",
             username: process.env.REDIS_SERVICE_NAME || "default",
             password: process.env.REDIS_PASSWORD! || "auth",
             port: 6379,
