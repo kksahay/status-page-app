@@ -20,7 +20,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   const [emailError, setEmailError] = useState("")
   const [isPending, setIsPending] = useState(false);
   const { toast } = useToast()
-  const { login } = useContext(AuthContext);
+  const { login, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const validateEmail = (email: string) => {
@@ -46,6 +46,11 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     try {
       const data = await loginApi(email, password);
       login(data.role);
+      setUser({
+        userId: data.userId,
+        name: data.name,
+        email: data.email,
+      })
       navigate(data.role === "admin" ? "/admin" : "/dashboard");
       setIsPending(false);
     } catch (error) {

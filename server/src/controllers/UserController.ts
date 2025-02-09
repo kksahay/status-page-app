@@ -52,7 +52,15 @@ export class UserController extends BaseController {
                 },
                 process.env.JWT_SECRET as string
             );
-            return c.json({ message: "User Authenticated successfully", role: accountInfoValue[2], token }, 200);
+            return c.json(
+                {
+                    message: "User Authenticated successfully",
+                    userId: accountInfoValue[1],
+                    name: user.name,
+                    email: user.email,
+                    role: accountInfoValue[2],
+                    token
+                }, 200);
         } catch (error: any) {
             return c.json(error, 400);
         }
