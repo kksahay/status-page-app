@@ -11,6 +11,7 @@ import ServicesPage from "./pages/services";
 import MaintenancePage from "./pages/maintenance";
 import { Toaster } from "@/components/ui/toaster"
 import IncidentsPage from "./pages/incidents";
+import { TeamList } from "./pages/team-list";
 
 const ProtectedRoute = ({ element, requiredRole }: { element: JSX.Element; requiredRole?: string }) => {
   const { isAuthenticated, role } = useContext(AuthContext);
@@ -37,7 +38,9 @@ function App() {
           <Route path="/status/:userId/events" element={<EventsPage />} />
 
 
-          <Route path="/admin" element={<ProtectedRoute element={<AdminDashboard />} requiredRole="admin" />} />
+          <Route path="/admin" element={<ProtectedRoute element={<AdminDashboard />} requiredRole="admin" />}>
+            <Route index element={<TeamList />} />
+          </Route>
 
 
           <Route path="/dashboard" element={<ProtectedRoute element={<UserDashboard />} requiredRole="user" />}>

@@ -69,30 +69,7 @@ export function UserSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
 
             {/* Sidebar Content */}
             <SidebarContent className="px-2 py-4">
-                <SidebarMenu className="space-y-1">
-                    {data.navMain.map((item) => {
-                        const isActive = activePath === item.url;
-                        return (
-                            <SidebarMenuItem key={item.url}>
-                                <SidebarMenuButton asChild>
-                                    <Link
-                                        to={item.title === "User Status" ? userStatusUrl : item.url}
-                                        className={cn(
-                                            "flex items-center gap-3 px-4 py-2 text-base font-semibold rounded-md transition-all duration-200",
-                                            isActive
-                                                ? "bg-gray-800 text-white shadow-sm"
-                                                : "text-gray-400 hover:bg-gray-800 hover:text-white"
-                                        )}
-                                        target={item.title === "User Status" ? "_blank" : undefined}
-                                    >
-                                        <item.icon className="size-5" />
-                                        <span>{item.title}</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        );
-                    })}
-                </SidebarMenu>
+                
             </SidebarContent>
 
             {/* Sidebar Footer */}

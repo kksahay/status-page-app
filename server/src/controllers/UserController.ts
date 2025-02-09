@@ -77,7 +77,7 @@ export class UserController extends BaseController {
                 return c.json({ message: "Unauthorized to perform action" }, 400);
             }
             await this.userQueries.execDeleteTeam(parseInt(userId));
-            return c.json("User deleted successfully", 200);
+            return c.json({ message: "User deleted successfully" }, 200);
         } catch (error: any) {
             return c.json(error, 400);
         }

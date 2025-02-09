@@ -22,3 +22,13 @@ export const userDetailsApi = async () => {
     const response = await api.get("/user/userDetails");
     return response.data;
 }
+
+export const teamListApi = async () => {
+    const response = await api.get("/user/teamList");
+    return response.data;
+}
+
+export const deleteTeamApi = async (userId: number) => {
+    const response = await api.delete(`/user/delete/${userId}`);
+    return response.data;
+}
