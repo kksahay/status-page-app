@@ -14,7 +14,7 @@ import {
 import { AuthContext } from "@/context/authContext";
 import { useContext } from "react";
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useContext(AuthContext);
 
   return (
