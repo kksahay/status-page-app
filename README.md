@@ -19,3 +19,9 @@
 2. **Access the application**:  
    Open your browser and navigate to:  
    `http://localhost`
+   
+3. By default, the application creates an admin page with the following credentials:
+
+    - **Email**: `admin@status-app.com`
+    - **Password**: `admin@123`
+
