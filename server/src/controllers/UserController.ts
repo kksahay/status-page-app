@@ -50,7 +50,7 @@ export class UserController extends BaseController {
                     role: accountInfoValue[2],
                     exp: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60),
                 },
-                process.env.JWT_SECRET as string
+                process.env.JWT_SECRET! || "StatusAppSecret"
             );
             return c.json(
                 {

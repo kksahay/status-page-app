@@ -12,7 +12,7 @@ interface StatusMetricProps {
   statuses: string[];
 }
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:3000";
 export const socket: Socket = io(SOCKET_URL, {
   reconnection: true,
   reconnectionAttempts: 5,

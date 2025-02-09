@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: my-postgres
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:latest
+    container_name: my-redis
+    ports:
+      - "6379:6379"
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: my-server
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "3000:3000" 
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: my-client
+    depends_on:
+      - server
+    ports:
+      - "80:80"

@@ -9,8 +9,8 @@ export class AuthMiddleware {
             if (!token) {
                 throw new Error("Unauthorized request");
             }
-            
-            await verify(token, process.env.JWT_SECRET as string);
+
+            await verify(token, process.env.JWT_SECRET! || "StatusAppSecret");
             const decodedToken = decode(token);
             const { payload } = decodedToken;
             c.set("user", payload);
