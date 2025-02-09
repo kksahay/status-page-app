@@ -4,14 +4,14 @@ export class RedisClient {
     private readonly redisClient: Redis;
 
     constructor() {
-        
+
         this.redisClient = new Redis({
-            host: process.env.REDIS_HOST!,
+            host: process.env.REDIS_HOST! || "127.0.0.1",
             username: process.env.REDIS_SERVICE_NAME || "default",
-            password: process.env.REDIS_PASSWORD!,
+            password: process.env.REDIS_PASSWORD! || "auth",
             port: 6379,
             maxRetriesPerRequest: null,
-            tls: {}
+            tls: process.env.REDIS_HOST ? {} : undefined,
         });
 
         this.initialize();

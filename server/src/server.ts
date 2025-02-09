@@ -10,7 +10,7 @@ export const sql: postgres.Sql = db.sql;
 
 db.checkConnection()
   .then(() => {
-    new App(parseInt(process.env.PORT!));
+    new App(3000);
     jobQueue.enqueue();
   })
   .catch((error) => {

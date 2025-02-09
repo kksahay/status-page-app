@@ -56,9 +56,9 @@ export class UserController extends BaseController {
                 {
                     message: "User Authenticated successfully",
                     userId: accountInfoValue[1],
-                    name: user.name,
-                    email: user.email,
                     role: accountInfoValue[2],
+                    name: accountInfoValue[3],
+                    email: user.email,
                     token
                 }, 200);
         } catch (error: any) {

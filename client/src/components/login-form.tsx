@@ -45,12 +45,12 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     setIsPending(true);
     try {
       const data = await loginApi(email, password);
-      login(data.role);
       setUser({
         userId: data.userId,
         name: data.name,
         email: data.email,
       })
+      login(data.role);
       navigate(data.role === "admin" ? "/admin" : "/dashboard");
       setIsPending(false);
     } catch (error) {

@@ -27,7 +27,7 @@ export class UserQueries {
     async execLogin(user: User): Promise<unknown[]> {
         const response = await sql`
             SELECT
-                hashed_pwd, user_id, role
+                hashed_pwd, user_id, role, name
             FROM
                 public.tblUser
             WHERE

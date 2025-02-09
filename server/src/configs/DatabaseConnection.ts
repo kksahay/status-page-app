@@ -3,9 +3,9 @@ import postgres from "postgres";
 export class DatabaseConnection {
     public sql: postgres.Sql;
     constructor() {
-        this.sql = postgres(process.env.DB_URI as string, {
+        this.sql = postgres(process.env.DB_URI! || "postgres://myuser:mypassword@localhost:5432/mydatabase", {
             port: 5432,
-            ssl: true
+            ssl: process.env.DB_URI ? true : false
         });
     }
     async checkConnection() {

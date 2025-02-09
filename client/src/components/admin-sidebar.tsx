@@ -16,7 +16,6 @@ import { useContext } from "react";
 
 export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useContext(AuthContext);
-
   return (
     <Sidebar className="bg-gray-900 text-white flex flex-col h-full" {...props}>
       {/* Sidebar Header */}
