@@ -17,3 +17,8 @@ export const registerApi = async (name: string, email: string, pwd: string) => {
     const response = await api.post("/user/register", { name, email, pwd, role: "user" });
     return response.data;
 }
+
+export const userDetailsApi = async () => {
+    const response = await api.get("/user/userDetails");
+    return response.data;
+}

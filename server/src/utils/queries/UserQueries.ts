@@ -3,7 +3,7 @@ import type { User } from "../types/User.js";
 
 export class UserQueries {
 
-    async checkUser (user: User): Promise<unknown[]> {
+    async checkUser(user: User): Promise<unknown[]> {
         const response = await sql`
             SELECT
                 user_id
@@ -32,6 +32,18 @@ export class UserQueries {
                 public.tblUser
             WHERE
                 email = ${user.email}
+        `;
+        return response;
+    }
+
+    async execUserDetails(userId: number): Promise<unknown[]> {
+        const response = await sql`
+            SELECT
+                user_id, name, email
+            FROM
+                public.tblUser
+            WHERE
+                user_id = ${userId}
         `;
         return response;
     }

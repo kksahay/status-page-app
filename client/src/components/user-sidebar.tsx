@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import type * as React from "react";
-import { Activity, Bell, Cog, Command } from "lucide-react";
+import { Activity, Bell, Cog, Command, User } from "lucide-react"; // Import User icon
 
 import { NavUser } from "./nav-user";
 import {
@@ -13,13 +13,10 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { AuthContext } from "@/context/authContext";
+import { useContext } from "react";
 
 const data = {
-    user: {
-        name: "shadcn",
-        email: "m@example.com",
-        avatar: "/avatars/shadcn.jpg",
-    },
     navMain: [
         {
             title: "Services",
@@ -36,16 +33,21 @@ const data = {
             url: "/dashboard/maintenance",
             icon: Activity,
         },
+        {
+            title: "User Status",
+            url: "/status/userId",
+            icon: User,
+        },
     ],
 };
 
 export function UserSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const location = useLocation();
-
-    // Default to "Services" if no match
     const activePath = data.navMain.some((item) => item.url === location.pathname)
         ? location.pathname
         : "/dashboard/services";
+    const { user } = useContext(AuthContext);
+    const userStatusUrl = `/status/${user?.userId || "unknown"}`;
 
     return (
         <Sidebar className="bg-gray-900 text-white" {...props}>
@@ -74,13 +76,14 @@ export function UserSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
                             <SidebarMenuItem key={item.url}>
                                 <SidebarMenuButton asChild>
                                     <Link
-                                        to={item.url}
+                                        to={item.title === "User Status" ? userStatusUrl : item.url}
                                         className={cn(
                                             "flex items-center gap-3 px-4 py-2 text-base font-semibold rounded-md transition-all duration-200",
                                             isActive
                                                 ? "bg-gray-800 text-white shadow-sm"
                                                 : "text-gray-400 hover:bg-gray-800 hover:text-white"
                                         )}
+                                        target={item.title === "User Status" ? "_blank" : undefined}
                                     >
                                         <item.icon className="size-5" />
                                         <span>{item.title}</span>
@@ -94,7 +97,11 @@ export function UserSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
 
             {/* Sidebar Footer */}
             <SidebarFooter className="border-t border-gray-800 p-4">
-                <NavUser user={data.user} />
+                <NavUser user={{
+                    name: user?.name || "Shadcn",
+                    email: user?.email || "shadcn@example.com",
+                    avatar: "/avatars/shadcn.jpg",
+                }} />
             </SidebarFooter>
         </Sidebar>
     );

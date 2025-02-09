@@ -58,11 +58,21 @@ export class UserController extends BaseController {
         }
     }
 
+    async userDetails(c: Context) {
+        try {
+            const user = c.get("user");
+            const result: unknown = (await this.userQueries.execUserDetails(user.userId))[0];
+            const values: string[] = this.getValues(result);
+            return c.json({ userId: values[0], name: values[1], email: values[2] }, 200);
+        } catch (error: any) {
+            return c.json(error, 400);
+        }
+    }
+
     async deleteTeam(c: Context) {
         try {
             const user = c.get("user");
             const userId = c.req.param("userId");
-            console.log(userId);
             if (user.role !== "admin") {
                 return c.json({ message: "Unauthorized to perform action" }, 400);
             }
