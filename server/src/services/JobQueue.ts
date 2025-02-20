@@ -19,8 +19,25 @@ export class JobQueue {
     constructor() {
         this.redis = redisClient.getClient();
         this.queue = new Queue("jobs-monitor", { connection: this.redis });
-        this.serviceWorker = new Worker("jobs-monitor", this.checkServices.bind(this), { connection: this.redis });
-        this.maintenanceWorker = new Worker("jobs-monitor", this.checkMaintenance.bind(this), { connection: this.redis });
+        this.serviceWorker = new Worker(
+    "jobs-monitor",
+    async (job) => {
+        if (job.name === "endpoints-monitor") {
+            await this.checkServices();
+        }
+    },
+    { connection: this.redis }
+);
+
+this.maintenanceWorker = new Worker(
+    "jobs-monitor",
+    async (job) => {
+        if (job.name === "maintenance-check") {
+            await this.checkMaintenance();
+        }
+    },
+    { connection: this.redis }
+);
         this.jobQueries = new JobQueries();
     }
 
